@@ -1,6 +1,6 @@
 package classes;
 
-public class Recu {
+public class Reçu {
 	String refRecu;
 	String dateRecu;
 }

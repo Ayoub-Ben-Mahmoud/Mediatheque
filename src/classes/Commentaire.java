@@ -3,5 +3,5 @@ package classes;
 public class Commentaire {
 	String refCom;
 	String Com ;
-	String refDoc;
+	String ISBN;//refrences to ISBN in Document Class
 }

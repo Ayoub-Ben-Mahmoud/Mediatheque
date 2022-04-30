@@ -1,9 +1,9 @@
 package classes;
 
 public class Emprunt {
-	int numEmp ;
+	long numEmp ;
 	String dateEmp;
 	String dateRetour;
 	String refEmp;
-	String idEmp;
+	String idEmprunteur;
 }

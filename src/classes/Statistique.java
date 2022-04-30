@@ -4,5 +4,5 @@ public class Statistique {
 	String idStat;
 	int nbrEmp;
 	int nbrCom;
-    String refDoc;
+    String ISBN;
 }
