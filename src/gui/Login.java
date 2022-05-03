@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -47,12 +46,15 @@ public class Login extends JFrame {
 	 * Create the frame.
 	 */
 	public Login() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    super("Login");
 		setBounds(100, 100, 507, 249);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		setResizable(false);
+	    setVisible(true);
+
 		
 
 		
@@ -85,42 +87,42 @@ public class Login extends JFrame {
 	         
 	        public void actionPerformed(ActionEvent e){ 
 	 
-	        String username = F_user.getText(); //Store username entered by the user in the variable "username"
-	        String password = F_password.getText(); //Store password entered by the user in the variable "password"
+	        String username = F_user.getText(); 
+	        String password = F_password.getText();
 	         
-	        if(username.equals("")) //If username is null
+	        if(username.equals(""))
 	        {
-	            JOptionPane.showMessageDialog(null,"Please enter username"); //Display dialog box with the message
-	        } 
-	        else if(password.equals("")) //If password is null
+	            JOptionPane.showMessageDialog(null,"Please enter username"); 	        } 
+	        else if(password.equals(""))
 	        {
-	            JOptionPane.showMessageDialog(null,"Please enter password"); //Display dialog box with the message
+	            JOptionPane.showMessageDialog(null,"Please enter password"); 
 	        }
-	        else { //If both the fields are present then to login the user, check wether the user exists already
-	            //System.out.println("Login connect");
-	        	Connection connection = Queries.conn(); //Connect to the database
+	        else { 
+	        	Connection connection = Queries.conn();
 	            try
 	            {
 	            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-	              ResultSet rs = stmt.executeQuery("SELECT * FROM user WHERE name='"+username+"' AND password='"+password+"'"); //Execute query
-	              if(rs.next()==false) { //Move pointer below
+	              ResultSet rs = stmt.executeQuery("SELECT * FROM user WHERE username='"+username+"' AND password='"+password+"'"); 
+	              if(rs.next()==false) { 
 	                  System.out.print("No user");  
-	                  JOptionPane.showMessageDialog(null,"Wrong Username/Password!"); //Display Message
+	                  JOptionPane.showMessageDialog(null,"Wrong Username/Password!");
 	 
 	              }
 	              else {
-	                rs.beforeFirst();  //Move the pointer above
-	                while(rs.next())
-	                {
-	                  String admin = rs.getString("admin"); //user is admin
-	                  if(admin.equals("0")) { //If boolean value 1
-		                    System.out.println("not admin");  
-	                  }
-	                  else{
-		                    System.out.println("admin");  
+	            	  {
+	                      String admin = rs.getString("admin"); //user is admin
+	                      //System.out.println(admin);
+	                      String uid = rs.getString("uid"); //Get user ID of the user
+	                      if(admin.equals("1")) { //If boolean value 1
+	                    	  dispose();
+	                    	  Admin_page User_page = new Admin_page(uid);
+	                      }
+	                      else{
+	                    	  dispose();
+	                    	  User_page User_page = new User_page(uid);
 
+	                      }
 	                  }
-	              }
 	              }
 	            }
 	            catch (SQLException e1) {
