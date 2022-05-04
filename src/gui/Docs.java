@@ -1,5 +1,4 @@
 package gui;
-
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,46 +17,43 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.sql.*;
 import DataBase.Queries;
-//import net.proteanit.sql.DbUtils;
 
 
 public class Docs extends JFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Docs frame = new Docs();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
+	private JTextField docISBN;
+	private JTextField docTitle;
+	private JTextField docAuth;
+	private JTextField docPages;
+	private JTextField docGenre;
+	private JTextField Editions;
+	
+	 
+     
+ 	/**
+ 	 * Launch the application.
+ 	 */
+ 	public static void main(String[] args) {
+ 		EventQueue.invokeLater(new Runnable() {
+ 			public void run() {
+ 				try {
+ 					Docs docs = new Docs();
+ 					docs.setVisible(true);
+ 					//docs.dispose();
+ 				} catch (Exception e) {
+ 					e.printStackTrace();
+ 				}
+ 			}
+ 		});
+ 	}
+     
 	public Docs() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new FormLayout(new ColumnSpec[] {
+		getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow"),
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
 				FormSpecs.RELATED_GAP_COLSPEC,
 				FormSpecs.DEFAULT_COLSPEC,
 				FormSpecs.RELATED_GAP_COLSPEC,
@@ -80,79 +76,90 @@ public class Docs extends JFrame {
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				FormSpecs.DEFAULT_ROWSPEC,}));
 		
-		JLabel lblNewLabel = new JLabel("Book ID");
-		contentPane.add(lblNewLabel, "2, 2, right, default");
+		JLabel lblNewLabel = new JLabel("ISBN");
+		getContentPane().add(lblNewLabel, "2, 2");
 		
-		textField = new JTextField();
-		contentPane.add(textField, "4, 2");
-		textField.setColumns(10);
+		docISBN = new JTextField();
+		getContentPane().add(docISBN, "4, 2, fill, default");
+		docISBN.setColumns(10);
 		
-		JLabel lblNewLabel_1 = new JLabel("User ID");
-		contentPane.add(lblNewLabel_1, "2, 4, right, default");
+		JLabel lblNewLabel_1 = new JLabel("Title");
+		getContentPane().add(lblNewLabel_1, "2, 4, right, default");
 		
-		textField_1 = new JTextField();
-		contentPane.add(textField_1, "4, 4, fill, default");
-		textField_1.setColumns(10);
+		docTitle = new JTextField();
+		getContentPane().add(docTitle, "4, 4, fill, default");
+		docTitle.setColumns(10);
 		
-		JLabel lblNewLabel_2 = new JLabel("Period");
-		contentPane.add(lblNewLabel_2, "2, 6, right, default");
+		JLabel lblNewLabel_2 = new JLabel("Author");
+		getContentPane().add(lblNewLabel_2, "2, 6, right, default");
 		
-		textField_2 = new JTextField();
-		contentPane.add(textField_2, "4, 6, fill, default");
-		textField_2.setColumns(10);
+		docAuth = new JTextField();
+		getContentPane().add(docAuth, "4, 6, fill, default");
+		docAuth.setColumns(10);
 		
-		JLabel lblNewLabel_3 = new JLabel("Issued Day (DD-MM-YY)");
-		contentPane.add(lblNewLabel_3, "2, 8, right, default");
+		JLabel lblNewLabel_3 = new JLabel("Pages");
+		getContentPane().add(lblNewLabel_3, "2, 8, right, default");
 		
-		textField_3 = new JTextField();
-		contentPane.add(textField_3, "4, 8, fill, default");
-		textField_3.setColumns(10);
+		docPages = new JTextField();
+		getContentPane().add(docPages, "4, 8, fill, default");
+		docPages.setColumns(10);
 		
-		JButton submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		contentPane.add(submitBtn, "4, 14, center, default");
-	//Testing Issued Books
-	JButton issued_but=new JButton("View Issued Books");//creating instance of JButton to view the issued books
-    issued_but.setBounds(280,20,160,25);//x axis, y axis, width, height 
-    issued_but.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e){
+		JLabel lblNewLabel_4 = new JLabel("Genre");
+		getContentPane().add(lblNewLabel_4, "2, 10, right, default");
+		
+		docGenre = new JTextField();
+		getContentPane().add(docGenre, "4, 10, fill, default");
+		docGenre.setColumns(10);
+		
+		JLabel lblEditions = new JLabel("Editions");
+		getContentPane().add(lblEditions, "2, 12");
+		
+		Editions = new JTextField();
+		getContentPane().add(Editions, "4, 12, fill, default");
+		Editions.setColumns(10);
+		
+		JButton addBtn = new JButton("Add Document");
+		getContentPane().add(addBtn, "4, 16");
+		
+		addBtn.addActionListener(new ActionListener() {
+			 public void actionPerformed(ActionEvent e){ 
+				 String book_isbn = docISBN.getText();
+                 String book_name = docTitle.getText();
+                 String book_publisher = docAuth.getText();
+                 String book_genre = docGenre.getText();
+                 //conevert int types to string 
+                 int book_pages = Integer.parseInt(docPages.getText());
+                 int editionsNbr = Integer.parseInt(Editions.getText());
+                
                  
-                JFrame f = new JFrame("Users List");
-                //f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                 
-                 
-                Connection connection = null;
-				try {
-					connection = Queries.conn();
-				} catch (SQLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-                String sql="select * from Documents";
-                try {
-                    Statement stmt = connection.createStatement();
-                     stmt.executeUpdate("mediatheque");
-                    stmt=connection.createStatement();
-                    ResultSet rs=stmt.executeQuery(sql);
-                    JTable book_list= new JTable();
-   //                book_list.setModel(DbUtils.resultSetToTableModel(rs)); 
-                     
-                    JScrollPane scrollPane = new JScrollPane(book_list);
- 
-                    f.getContentPane().add(scrollPane);
-                    f.setSize(800, 400);
-                    f.setVisible(true);
-                    f.setLocationRelativeTo(null);
-                } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
+                 Connection connection= Queries.conn();
+                 try {
+                     //Creating statement
+                     Statement stmt = connection.createStatement();
+                     //Query to insert in the table.
+                    
+         			
+         			stmt.executeUpdate("INSERT INTO books(book_isbn,book_name,book_publisher,book_genre,book_pages,book_editions) VALUES ('" + book_isbn + "','" + book_name + "','" + book_publisher + "','" + book_genre + "','" + book_pages + "','" + editionsNbr +"')");
+         			
+         			//stmt.executeUpdate("INSERT INTO user(username,password,email,admin,name,surname) VALUES ('" + F_Username.getText() + "','"+ F_Password.getText() +"','"+ F_Email.getText() +"','"+ "0" +"','"+ F_Name.getText() + "','" + F_Username.getText()+"')");
+                     //Creating Dialog Box to display message.
+                     JOptionPane.showMessageDialog(null, "Book added!");
+                 } 
+                 catch (Exception e1) {
+                     //Creating Dialog box to show any error if occured!
                      JOptionPane.showMessageDialog(null, e1);
-                }                                   
+                 }
+                 
+			 }
+		});
+		
+		
     }
-        }
-    );
-     
-}
-}
+
+	}
+
+
+
+
+		
+		
