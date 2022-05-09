@@ -2,12 +2,12 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
+import java.sql.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-public class Comments extends JFrame {
+import DataBase.Queries;
+public class View_Comments extends JFrame {
 
 	private JPanel contentPane;
 
@@ -18,7 +18,7 @@ public class Comments extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Comments frame = new Comments();
+					View_Comments frame = new View_Comments();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -30,7 +30,7 @@ public class Comments extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Comments() {
+	public View_Comments() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
