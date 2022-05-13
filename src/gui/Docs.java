@@ -84,7 +84,7 @@ public class Docs extends JFrame {
 				 }
 			}
 		});
-		btnAdd.setBounds(54, 311, 89, 23);
+		btnAdd.setBounds(151, 311, 89, 23);
 		getContentPane().add(btnAdd);
 		
 		JButton btnDelete = new JButton("Delete Book");
@@ -93,7 +93,7 @@ public class Docs extends JFrame {
 				
 			}
 		});
-		btnDelete.setBounds(195, 311, 89, 23);
+		btnDelete.setBounds(311, 311, 89, 23);
 		getContentPane().add(btnDelete);
 		
 		JButton btnView = new JButton("View Books");
@@ -101,7 +101,7 @@ public class Docs extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnView.setBounds(327, 311, 89, 23);
+		btnView.setBounds(311, 363, 89, 23);
 		getContentPane().add(btnView);
 		
 		JButton btnNewButton_3 = new JButton("Back");
@@ -109,7 +109,7 @@ public class Docs extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnNewButton_3.setBounds(54, 363, 89, 23);
+		btnNewButton_3.setBounds(151, 363, 89, 23);
 		getContentPane().add(btnNewButton_3);
 		
 	}     
@@ -119,6 +119,7 @@ public class Docs extends JFrame {
  				try {
  					Docs docs = new Docs();
  					docs.setVisible(true);
+ 					docs.setExtendedState(JFrame.MAXIMIZED_BOTH);
  					//docs.dispose();
  				} catch (Exception e) {
  					e.printStackTrace();
