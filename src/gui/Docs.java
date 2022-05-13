@@ -1,16 +1,7 @@
 package gui;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -18,20 +9,110 @@ import java.awt.event.ActionEvent;
 import java.sql.*;
 import DataBase.Queries;
 
-
 public class Docs extends JFrame {
-	private JTextField docISBN;
-	private JTextField docTitle;
-	private JTextField docAuth;
-	private JTextField docPages;
-	private JTextField docGenre;
-	private JTextField Editions;
-	
-	 
-     
- 	/**
- 	 * Launch the application.
- 	 */
+	public Docs() {
+		//Connection to DataBase 
+		
+		Connection connection= Queries.conn();
+		
+		getContentPane().setLayout(null);
+		
+		JLabel labelISBN = new JLabel("ISBN");
+		labelISBN.setBounds(70, 56, 46, 14);
+		getContentPane().add(labelISBN);
+		
+		JLabel labelTitle = new JLabel("Title");
+		labelTitle.setBounds(70, 94, 46, 14);
+		getContentPane().add(labelTitle);
+		
+		JTextField textISBN = new JTextField();
+		textISBN.setBounds(167, 53, 200, 20);
+		getContentPane().add(textISBN);
+		textISBN.setColumns(10);
+		
+		JTextField textTitle = new JTextField();
+		textTitle.setBounds(167, 91, 200, 20);
+		getContentPane().add(textTitle);
+		textTitle.setColumns(10);
+		
+		JLabel labelAuth = new JLabel("Author");
+		labelAuth.setBounds(70, 130, 46, 14);
+		getContentPane().add(labelAuth);
+		
+		JTextField textAuth = new JTextField();
+		textAuth.setBounds(167, 127, 200, 20);
+		getContentPane().add(textAuth);
+		textAuth.setColumns(10);
+		
+		JLabel lblP = new JLabel("Pages");
+		lblP.setBounds(70, 215, 46, 14);
+		getContentPane().add(lblP);
+		
+		JTextField txtP = new JTextField();
+		txtP.setBounds(167, 212, 200, 20);
+		getContentPane().add(txtP);
+		txtP.setColumns(10);
+		
+		JLabel lblS = new JLabel("Stock");
+		lblS.setBounds(70, 253, 46, 14);
+		getContentPane().add(lblS);
+		
+		JTextField txtS = new JTextField();
+		txtS.setBounds(169, 250, 198, 20);
+		getContentPane().add(txtS);
+		txtS.setColumns(10);
+		
+		JLabel labelG = new JLabel("Genre");
+		labelG.setBounds(70, 174, 46, 14);
+		getContentPane().add(labelG);
+		
+		JTextField textG = new JTextField();
+		textG.setBounds(167, 171, 200, 20);
+		getContentPane().add(textG);
+		textG.setColumns(10);
+		
+		JButton btnAdd = new JButton("Add Book");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				 try {
+                     //Creating statement
+                     Statement stmt = connection.createStatement();
+                     stmt.executeUpdate("INSERT INTO documents(ISBN ,bookname,genre,author,pages,stock) VALUES ('" + textISBN.getText() + "','" + textTitle.getText() + "','" + textG.getText() + "','" + textAuth.getText() + "','" + txtP.getText() + "','" + txtS.getText() +"')");
+				 }
+				 catch(Exception e1) {
+					 e1.printStackTrace();
+				 }
+			}
+		});
+		btnAdd.setBounds(54, 311, 89, 23);
+		getContentPane().add(btnAdd);
+		
+		JButton btnDelete = new JButton("Delete Book");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnDelete.setBounds(195, 311, 89, 23);
+		getContentPane().add(btnDelete);
+		
+		JButton btnView = new JButton("View Books");
+		btnView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnView.setBounds(327, 311, 89, 23);
+		getContentPane().add(btnView);
+		
+		JButton btnNewButton_3 = new JButton("Back");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnNewButton_3.setBounds(54, 363, 89, 23);
+		getContentPane().add(btnNewButton_3);
+		
+	}     
  	public static void main(String[] args) {
  		EventQueue.invokeLater(new Runnable() {
  			public void run() {
@@ -44,122 +125,5 @@ public class Docs extends JFrame {
  				}
  			}
  		});
- 	}
-     
-	public Docs() {
-		getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,}));
-		
-		JLabel lblNewLabel = new JLabel("ISBN");
-		getContentPane().add(lblNewLabel, "2, 2");
-		
-		docISBN = new JTextField();
-		getContentPane().add(docISBN, "4, 2, fill, default");
-		docISBN.setColumns(10);
-		
-		JLabel lblNewLabel_1 = new JLabel("Title");
-		getContentPane().add(lblNewLabel_1, "2, 4, right, default");
-		
-		docTitle = new JTextField();
-		getContentPane().add(docTitle, "4, 4, fill, default");
-		docTitle.setColumns(10);
-		
-		JLabel lblNewLabel_2 = new JLabel("Author");
-		getContentPane().add(lblNewLabel_2, "2, 6, right, default");
-		
-		docAuth = new JTextField();
-		getContentPane().add(docAuth, "4, 6, fill, default");
-		docAuth.setColumns(10);
-		
-		JLabel lblNewLabel_3 = new JLabel("Pages");
-		getContentPane().add(lblNewLabel_3, "2, 8, right, default");
-		
-		docPages = new JTextField();
-		getContentPane().add(docPages, "4, 8, fill, default");
-		docPages.setColumns(10);
-		
-		JLabel lblNewLabel_4 = new JLabel("Genre");
-		getContentPane().add(lblNewLabel_4, "2, 10, right, default");
-		
-		docGenre = new JTextField();
-		getContentPane().add(docGenre, "4, 10, fill, default");
-		docGenre.setColumns(10);
-		
-		JLabel lblEditions = new JLabel("Editions");
-		getContentPane().add(lblEditions, "2, 12");
-		
-		Editions = new JTextField();
-		getContentPane().add(Editions, "4, 12, fill, default");
-		Editions.setColumns(10);
-		
-		JButton addBtn = new JButton("Add Document");
-		getContentPane().add(addBtn, "4, 16");
-		
-		addBtn.addActionListener(new ActionListener() {
-			 public void actionPerformed(ActionEvent e){ 
-				 String book_isbn = docISBN.getText();
-                 String book_name = docTitle.getText();
-                 String book_publisher = docAuth.getText();
-                 String book_genre = docGenre.getText();
-                 //conevert int types to string 
-                 int book_pages = Integer.parseInt(docPages.getText());
-                 int editionsNbr = Integer.parseInt(Editions.getText());
-                
-                 
-                 Connection connection= Queries.conn();
-                 try {
-                     //Creating statement
-                     Statement stmt = connection.createStatement();
-                     //Query to insert in the table.
-                    
-         			
-         			stmt.executeUpdate("INSERT INTO books(book_isbn,book_name,book_publisher,book_genre,book_pages,book_editions) VALUES ('" + book_isbn + "','" + book_name + "','" + book_publisher + "','" + book_genre + "','" + book_pages + "','" + editionsNbr +"')");
-         			
-         			//stmt.executeUpdate("INSERT INTO user(username,password,email,admin,name,surname) VALUES ('" + F_Username.getText() + "','"+ F_Password.getText() +"','"+ F_Email.getText() +"','"+ "0" +"','"+ F_Name.getText() + "','" + F_Username.getText()+"')");
-                     //Creating Dialog Box to display message.
-                     JOptionPane.showMessageDialog(null, "Book added!");
-                 } 
-                 catch (Exception e1) {
-                     //Creating Dialog box to show any error if occured!
-                     JOptionPane.showMessageDialog(null, e1);
-                 }
-                 
-			 }
-		});
-		
-		
-    }
+ 	}}
 
-	}
-
-
-
-
-		
-		
