@@ -19,12 +19,13 @@ import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.JPasswordField;
 
 public class Login extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField F_user;
-	private JTextField F_password;
+	private JPasswordField F_password;
 
 	/**
 	 * Launch the application.
@@ -47,7 +48,7 @@ public class Login extends JFrame {
 	 */
 	public Login() {
 	    super("Login");
-		setBounds(100, 100, 507, 249);
+		setBounds(100, 100, 482, 249);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -59,8 +60,8 @@ public class Login extends JFrame {
 
 		
 		JLabel lblUsername = new JLabel("Username :");
-		lblUsername.setBounds(58, 24, 130, 39);
-		lblUsername.setFont(new Font("Lucida Handwriting", Font.PLAIN, 19));
+		lblUsername.setBounds(47, 24, 130, 39);
+		lblUsername.setFont(new Font("Lucida Handwriting", Font.BOLD, 19));
 		contentPane.add(lblUsername);
 		
 		F_user = new JTextField();
@@ -69,19 +70,30 @@ public class Login extends JFrame {
 		F_user.setColumns(10);
 		
 		JLabel lblPassword = new JLabel("Password  :");
-		lblPassword.setBounds(58, 73, 130, 39);
-		lblPassword.setFont(new Font("Lucida Handwriting", Font.PLAIN, 19));
+		lblPassword.setBounds(47, 73, 130, 39);
+		lblPassword.setFont(new Font("Lucida Handwriting", Font.BOLD, 19));
 		contentPane.add(lblPassword);
-		
-		F_password = new JTextField();
-		F_password.setBounds(184, 74, 194, 32);
-		contentPane.add(F_password);
-		F_password.setColumns(10);
 		
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setFont(new Font("Segoe Print", Font.BOLD, 14));
-		btnLogin.setBounds(209, 133, 130, 32);
+		btnLogin.setBounds(81, 136, 130, 32);
 		contentPane.add(btnLogin);
+		
+		F_password = new JPasswordField();
+		F_password.setFont(new Font("Tahoma", Font.BOLD, 15));
+		F_password.setBounds(184, 73, 194, 32);
+		contentPane.add(F_password);
+		
+		JButton btnregistration = new JButton("register");
+		btnregistration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+	          	Registration Registration = new Registration();
+				dispose();
+			}
+		});
+		btnregistration.setFont(new Font("Segoe Print", Font.BOLD, 14));
+		btnregistration.setBounds(221, 136, 130, 32);
+		contentPane.add(btnregistration);
 		
 		btnLogin.addActionListener(new ActionListener() {  //Perform action
 	         
@@ -102,24 +114,24 @@ public class Login extends JFrame {
 	            try
 	            {
 	            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-	              ResultSet rs = stmt.executeQuery("SELECT * FROM user WHERE username='"+username+"' AND password='"+password+"'"); 
+	              ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='"+username+"' AND password='"+password+"'"); 
 	              if(rs.next()==false) { 
-	                  System.out.print("No user");  
-	                  JOptionPane.showMessageDialog(null,"Wrong Username/Password!");
+
+	            	  JOptionPane.showMessageDialog(null,"Wrong Username/Password!");
 	 
 	              }
 	              else {
 	            	  {
 	                      String admin = rs.getString("admin"); //user is admin
 	                      //System.out.println(admin);
-	                      String uid = rs.getString("uid"); //Get user ID of the user
+	                      String id = rs.getString("id"); //Get user ID of the user
 	                      if(admin.equals("1")) { //If boolean value 1
 	                    	  dispose();
-	                    	  Admin_page User_page = new Admin_page(uid);
+	                    	  Admin_page User_page = new Admin_page(id);
 	                      }
 	                      else{
 	                    	  dispose();
-	                    	  User_page User_page = new User_page(uid);
+	                    	  User_page User_page = new User_page(id);
 
 	                      }
 	                  }

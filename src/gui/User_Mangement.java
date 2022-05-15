@@ -18,9 +18,12 @@ import java.awt.ScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 public class User_Mangement extends JFrame {
 	private JTable UserTable;
@@ -30,22 +33,25 @@ public class User_Mangement extends JFrame {
 	private JTextField F_Email;
 	private JTextField F_Password;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					User_Mangement frame = new User_Mangement();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					String id = null;
+//					User_page frame = new User_page(id);
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
+	
+	
 	/**
 	 * Create the frame.
 	 * @return 
@@ -56,7 +62,7 @@ public class User_Mangement extends JFrame {
         try {
         	Connection connection = Queries.conn();
             Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rcount = stmt.executeQuery("SELECT COUNT(*)AS count FROM user");
+			ResultSet rcount = stmt.executeQuery("SELECT COUNT(*)AS count FROM users");
             rcount.next();
             count = rcount.getInt("count");
 		} catch (Exception e) {
@@ -65,7 +71,8 @@ public class User_Mangement extends JFrame {
 		}
 		return count;
 	}
-	public User_Mangement() {
+	
+	public User_Mangement(String id) {
 		
 		
 	    super("User Mangement");
@@ -77,15 +84,15 @@ public class User_Mangement extends JFrame {
 	    
 		int count=count();
 		
-        String columns[] = { "Uid","Username","Password","Email","Name","Surname","Admin" };
+        String columns[] = { "id","Username","Password","Email","Name","Surname","Admin" };
         String data[][] = new String[count][7];
 	    
     	Connection connection = Queries.conn();
 
     	try {
-            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            Statement st = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM user");
+            ResultSet rs = st.executeQuery("SELECT * FROM users");
             
             int i = 0;
 
@@ -93,7 +100,7 @@ public class User_Mangement extends JFrame {
             
             while (rs.next()) {
 
-                int uid = rs.getInt("uid");
+                int uid = rs.getInt("id");
                 String username = rs.getString("username");
                 String password = rs.getString("password");
                 String email = rs.getString("email");
@@ -122,6 +129,24 @@ public class User_Mangement extends JFrame {
 
         DefaultTableModel model = new DefaultTableModel(data, columns);
         JTable table = new JTable(model);
+        table.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        	    int selectedRowIndex = table.getSelectedRow();
+        	       
+
+        	    F_Username.setText(model.getValueAt(selectedRowIndex, 1).toString());
+        	    F_Password.setText(model.getValueAt(selectedRowIndex, 2).toString());
+        	    F_Email.setText(model.getValueAt(selectedRowIndex, 3).toString());
+        	    F_Name.setText(model.getValueAt(selectedRowIndex, 4).toString());
+        	    F_Surname.setText(model.getValueAt(selectedRowIndex, 5).toString());
+
+
+               
+        	}
+        });
+
+        table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
         table.setShowVerticalLines(true);
 	    JScrollPane scrollPane = new JScrollPane(table);
@@ -137,11 +162,13 @@ public class User_Mangement extends JFrame {
     		        }
     	    		else {
     	                try {
-    	                	PreparedStatement stmt = connection.prepareStatement("INSERT INTO user(username,password,email,admin,name,surname) VALUES ('" + F_Username.getText() + "','"+ F_Password.getText() +"','"+ F_Email.getText() +"','"+ "0" +"','"+ F_Name.getText() + "','" + F_Surname.getText()+"')");
-				            ResultSet rs = stmt.executeQuery("SELECT * FROM user WHERE uid=(SELECT max(uid) FROM user);"); 
+    	                	PreparedStatement st = connection.prepareStatement("INSERT INTO users(username,password,email,admin,name,surname) VALUES ('" + F_Username.getText() + "','"+ F_Password.getText() +"','"+ F_Email.getText() +"','"+ "0" +"','"+ F_Name.getText() + "','" + F_Surname.getText()+"')");
+							st.executeUpdate(); 
+
+    	                	ResultSet rs = st.executeQuery("SELECT * FROM users WHERE id=(SELECT max(id) FROM users);"); 
 
 				            while (rs.next()) {
-				                int id = rs.getInt("uid");
+				                int id = rs.getInt("id");
 				                String username = rs.getString("username");
 				                String password = rs.getString("password");
 				                String email = rs.getString("email");
@@ -160,10 +187,10 @@ public class User_Mangement extends JFrame {
         	    			model.addRow(columns);
         	    			
         	    			F_Username.setText("");
-        	    			F_Password.setText("");
-        	    			F_Email.setText("");
+       	    			    F_Password.setText("");
+       	    			    F_Email.setText("");
         	    			F_Name.setText("");
-        	    			F_Surname.setText("");
+       	    			    F_Surname.setText("");
 				            }
   
     	                
@@ -184,18 +211,7 @@ public class User_Mangement extends JFrame {
     	    
     	    
     	    
-    	    table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){ 
-    	          @Override
-    	          public void valueChanged(ListSelectionEvent e) {
-    	                int i = table.getSelectedRow();
-    	                F_Username.setText((String)model.getValueAt(i, 1));
-    	                F_Password.setText((String)model.getValueAt(i, 2));
-    	                F_Email.setText((String)model.getValueAt(i, 3));
-    	                F_Name.setText((String)model.getValueAt(i, 4));
-    	                F_Surname.setText((String)model.getValueAt(i, 5));
 
-    	            }
-    	        });
     	    
     	    JButton btnUpdate = new JButton("update");
     	    btnUpdate.addActionListener(new ActionListener() {
@@ -205,7 +221,7 @@ public class User_Mangement extends JFrame {
     	    			String value = table.getModel().getValueAt(i, 0).toString();
     	        	    try {
     	        	    	
-							PreparedStatement st = connection.prepareStatement("UPDATE user SET username = ? , password = ? , email = ? , admin = ?  ,  name = ? , surname = ?   WHERE uid = "+value+"");
+							PreparedStatement st = connection.prepareStatement("UPDATE users SET username = ? , password = ? , email = ? , admin = ?  ,  name = ? , surname = ?   WHERE id = "+value+"");
 							
 							st.setString(1, F_Username.getText());
 							st.setString(2, F_Password.getText());
@@ -239,26 +255,30 @@ public class User_Mangement extends JFrame {
     	    JButton btnDelete = new JButton("delete");
     	    btnDelete.addActionListener(new ActionListener() {
     	    	public void actionPerformed(ActionEvent e) {
-    	    		int i =table.getSelectedRow()-1;
+    	    		int i=table.getSelectedRow();
 	    			String value = table.getModel().getValueAt(i, 0).toString();
-
+	    	        table.changeSelection(count, 0, true,false );
     	    		if(i>=0) {   	
-        	    		model.removeRow(i);
-
-    	        	    try {
+    	    		
+    	    		    model.removeRow(i);
+    	    		    
+                         try {
     	        	    	
-							PreparedStatement st = connection.prepareStatement("DELETE FROM user WHERE uid = "+value+"");
+							PreparedStatement st = connection.prepareStatement("DELETE FROM users WHERE id = "+value+"");
+							
 					        st.executeUpdate(); 
+					        
 						} catch (SQLException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-
+    	    		 
     	    		JOptionPane.showMessageDialog(null, "Deleted Successfully");
     	    		}else
     	    		{
     	    		JOptionPane.showMessageDialog(null, "Please Select a Row First !!");
     	    		}
+
     	    	}
     	    });
     	    btnDelete.setBounds(180, 214, 75, 21);
@@ -269,27 +289,27 @@ public class User_Mangement extends JFrame {
     	    getContentPane().add(lblNewLabel);
     	    
     	    F_Username = new JTextField();
-    	    F_Username.setBounds(83, 50, 118, 19);
+    	    F_Username.setBounds(83, 50, 131, 19);
     	    getContentPane().add(F_Username);
     	    F_Username.setColumns(10);
     	    
     	    F_Password = new JTextField();
-    	    F_Password.setBounds(83, 76, 118, 19);
+    	    F_Password.setBounds(83, 76, 131, 19);
     	    getContentPane().add(F_Password);
     	    F_Password.setColumns(10);
     	    
     	    F_Name = new JTextField();
-    	    F_Name.setBounds(83, 105, 118, 19);
+    	    F_Name.setBounds(83, 105, 131, 19);
     	    getContentPane().add(F_Name);
     	    F_Name.setColumns(10);
     	    
     	    F_Surname = new JTextField();
-    	    F_Surname.setBounds(83, 134, 118, 19);
+    	    F_Surname.setBounds(83, 134, 131, 19);
     	    getContentPane().add(F_Surname);
     	    F_Surname.setColumns(10);
     	    
     	    F_Email = new JTextField();
-    	    F_Email.setBounds(83, 163, 118, 19);
+    	    F_Email.setBounds(83, 163, 131, 19);
     	    getContentPane().add(F_Email);
     	    F_Email.setColumns(10);
     	    
@@ -310,6 +330,18 @@ public class User_Mangement extends JFrame {
     	    JLabel lblNewLabel_4 = new JLabel("  Password :");
     	    lblNewLabel_4.setBounds(10, 82, 75, 13);
     	    getContentPane().add(lblNewLabel_4);
+    	    
+    	    JButton btnBack = new JButton("Back");
+    	    btnBack.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+              	  Admin_page User_page = new Admin_page(id);
+    			  dispose();
+
+
+    	    	}
+    	    });
+    	    btnBack.setBounds(95, 254, 75, 21);
+    	    getContentPane().add(btnBack);
     	    
 
             
