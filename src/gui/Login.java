@@ -13,19 +13,19 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.JPasswordField;
 
 public class Login extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField F_user;
-	private JTextField F_password;
+	private JPasswordField F_password;
 
 	/**
 	 * Launch the application.
@@ -47,18 +47,21 @@ public class Login extends JFrame {
 	 * Create the frame.
 	 */
 	public Login() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 507, 249);
+	    super("Login");
+		setBounds(100, 100, 482, 249);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		setResizable(false);
+	    setVisible(true);
+
 		
 
 		
 		JLabel lblUsername = new JLabel("Username :");
-		lblUsername.setBounds(58, 24, 130, 39);
-		lblUsername.setFont(new Font("Lucida Handwriting", Font.PLAIN, 19));
+		lblUsername.setBounds(47, 24, 130, 39);
+		lblUsername.setFont(new Font("Lucida Handwriting", Font.BOLD, 19));
 		contentPane.add(lblUsername);
 		
 		F_user = new JTextField();
@@ -67,60 +70,71 @@ public class Login extends JFrame {
 		F_user.setColumns(10);
 		
 		JLabel lblPassword = new JLabel("Password  :");
-		lblPassword.setBounds(58, 73, 130, 39);
-		lblPassword.setFont(new Font("Lucida Handwriting", Font.PLAIN, 19));
+		lblPassword.setBounds(47, 73, 130, 39);
+		lblPassword.setFont(new Font("Lucida Handwriting", Font.BOLD, 19));
 		contentPane.add(lblPassword);
-		
-		F_password = new JTextField();
-		F_password.setBounds(184, 74, 194, 32);
-		contentPane.add(F_password);
-		F_password.setColumns(10);
 		
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setFont(new Font("Segoe Print", Font.BOLD, 14));
-		btnLogin.setBounds(209, 133, 130, 32);
+		btnLogin.setBounds(81, 136, 130, 32);
 		contentPane.add(btnLogin);
+		
+		F_password = new JPasswordField();
+		F_password.setFont(new Font("Tahoma", Font.BOLD, 15));
+		F_password.setBounds(184, 73, 194, 32);
+		contentPane.add(F_password);
+		
+		JButton btnregistration = new JButton("register");
+		btnregistration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+	          	Registration Registration = new Registration();
+				dispose();
+			}
+		});
+		btnregistration.setFont(new Font("Segoe Print", Font.BOLD, 14));
+		btnregistration.setBounds(221, 136, 130, 32);
+		contentPane.add(btnregistration);
 		
 		btnLogin.addActionListener(new ActionListener() {  //Perform action
 	         
 	        public void actionPerformed(ActionEvent e){ 
 	 
-	        String username = F_user.getText(); //Store username entered by the user in the variable "username"
-	        String password = F_password.getText(); //Store password entered by the user in the variable "password"
+	        String username = F_user.getText(); 
+	        String password = F_password.getText();
 	         
-	        if(username.equals("")) //If username is null
+	        if(username.equals(""))
 	        {
-	            JOptionPane.showMessageDialog(null,"Please enter username"); //Display dialog box with the message
-	        } 
-	        else if(password.equals("")) //If password is null
+	            JOptionPane.showMessageDialog(null,"Please enter username"); 	        } 
+	        else if(password.equals(""))
 	        {
-	            JOptionPane.showMessageDialog(null,"Please enter password"); //Display dialog box with the message
+	            JOptionPane.showMessageDialog(null,"Please enter password"); 
 	        }
-	        else { //If both the fields are present then to login the user, check wether the user exists already
-	            //System.out.println("Login connect");
-	        	Connection connection = Queries.conn(); //Connect to the database
+	        else { 
+	        	Connection connection = Queries.conn();
 	            try
 	            {
 	            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-	              ResultSet rs = stmt.executeQuery("SELECT * FROM user WHERE name='"+username+"' AND password='"+password+"'"); //Execute query
-	              if(rs.next()==false) { //Move pointer below
-	                  System.out.print("No user");  
-	                  JOptionPane.showMessageDialog(null,"Wrong Username/Password!"); //Display Message
+	              ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='"+username+"' AND password='"+password+"'"); 
+	              if(rs.next()==false) { 
+
+	            	  JOptionPane.showMessageDialog(null,"Wrong Username/Password!");
 	 
 	              }
 	              else {
-	                rs.beforeFirst();  //Move the pointer above
-	                while(rs.next())
-	                {
-	                  String admin = rs.getString("admin"); //user is admin
-	                  if(admin.equals("0")) { //If boolean value 1
-		                    System.out.println("not admin");  
-	                  }
-	                  else{
-		                    System.out.println("admin");  
+	            	  {
+	                      String admin = rs.getString("admin"); //user is admin
+	                      //System.out.println(admin);
+	                      String id = rs.getString("id"); //Get user ID of the user
+	                      if(admin.equals("1")) { //If boolean value 1
+	                    	  dispose();
+	                    	  Admin_page User_page = new Admin_page(id);
+	                      }
+	                      else{
+	                    	  dispose();
+	                    	  User_page User_page = new User_page(id);
 
+	                      }
 	                  }
-	              }
 	              }
 	            }
 	            catch (SQLException e1) {
