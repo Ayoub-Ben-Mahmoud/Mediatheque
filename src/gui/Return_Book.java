@@ -3,6 +3,9 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,10 +29,6 @@ import java.awt.event.InputMethodEvent;
 
 public class Return_Book extends JFrame {
 	private JTable ReturnTable;
-	private JTextField user_id;
-	private JTextField return_date;
-	private JTextField dayselp;
-	private JTextField fine;
 
 	/**
 	 * Launch the application.
@@ -57,7 +56,7 @@ public class Return_Book extends JFrame {
         try {
         	Connection connection = Queries.conn();
             Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rcount = stmt.executeQuery("SELECT COUNT(*)AS count FROM return_book");
+			ResultSet rcount = stmt.executeQuery("SELECT COUNT(*)AS count FROM issue_book");
             rcount.next();
             count = rcount.getInt("count");
 		} catch (Exception e) {
@@ -66,6 +65,23 @@ public class Return_Book extends JFrame {
 		}
 		return count;
 	}
+	
+	public int stock(int id) {
+	    int stock = 0;
+
+        try {
+        	Connection connection = Queries.conn();
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rstock = stmt.executeQuery("SELECT stock FROM documents WHERE id='" + id +"' ");
+            rstock.next();
+            stock = rstock.getInt("stock");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stock;
+	}
+	
 	public Return_Book() {
 		
 		
@@ -78,10 +94,46 @@ public class Return_Book extends JFrame {
 	    
 		int count=count();
 		
-        String columns[] = {"ID","Book Name ","Book ISBN","Return Date","Days Elp","Fine"};
-        String data[][] = new String[count][6];
+        String columns[] = {"IID","Book Name ","Book ID","Issue Date","Return Date","Period","Fine"};
+        String data[][] = new String[count][7];
 	    
     	Connection connection = Queries.conn();
+
+    	try {
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM issue_book JOIN documents  ON issue_book.bookid=documents.id");
+            
+            int i = 0;
+
+
+            
+            while (rs.next()) {
+
+                int id = rs.getInt("issue_book.id");
+                String bookid = rs.getString("bookid");
+                String bookname = rs.getString("documents.bookname");
+                String issuedate = rs.getString("issuedate");
+                String returndate = rs.getString("returndate");
+                String period = rs.getString("period");
+                String fine = rs.getString("fine");
+               
+                
+                data[i][0] = id + "";
+                data[i][1] = bookname;
+                data[i][2] = bookid;
+                data[i][3] = issuedate;
+                data[i][4] = returndate;
+                data[i][5] = period;
+                data[i][6] = fine+ "";
+                i++;
+                
+              }
+
+        } catch (SQLException e1) {
+            // TODO Auto-generated catch block
+			e1.printStackTrace();
+        } 
 
     	
         DefaultTableModel model = new DefaultTableModel(data, columns);
@@ -89,63 +141,107 @@ public class Return_Book extends JFrame {
         table.setShowGrid(true);
         table.setShowVerticalLines(true);
 	    JScrollPane scrollPane = new JScrollPane(table);
-	    scrollPane.setBounds(265, 10, 450, 265);
+	    scrollPane.setBounds(151, 10, 564, 265);
 	    getContentPane().add(scrollPane);
 	    
     	    JButton returnbook = new JButton("Return");
     	    returnbook.addActionListener(new ActionListener() {
     	    	public void actionPerformed(ActionEvent e) {
-    	    		if(user_name.getText().equals("")||user_id.getText().equals("")||book_name.getText().equals("")||book_isbn.getText().equals("")||return_date.getText().equals("") ||dayselp.getText().equals(""))
+    	    		
+    	    		long millis=System.currentTimeMillis();
+    	    		java.sql.Date Now=new java.sql.Date(millis);
+    	    		String date =Now.toString();
+    	    		int i =table.getSelectedRow();
+    	    		String value = table.getModel().getValueAt(i, 0).toString();
+    	    		
+    	    		if(i>=0 )
     		        {
-    	    			JOptionPane.showMessageDialog(null,"Please Fill Complete Information !!");
+    	    			if(data[i][4]==null){
+    	    				try {
+        	        	    	
+    							PreparedStatement st = connection.prepareStatement("UPDATE issue_book SET  returndate = ?   WHERE id = "+value+"");
+    							st.setString(1, date);
+    							st.executeUpdate(); 
+    						} catch (SQLException e1) {
+    							// TODO Auto-generated catch block
+    							e1.printStackTrace();
+    						}
+                            model.setValueAt(Now, i, 4);
+                            
+                            String valuestock = table.getModel().getValueAt(i, 2).toString();
+                            int j=stock(  Integer.parseInt(valuestock))+1;
+                            try {
+       	        	    	
+    							PreparedStatement st = connection.prepareStatement("UPDATE documents SET  stock = "+j+"   WHERE id = "+valuestock+"");
+    							
+    							st.executeUpdate(); 
+    						} catch (SQLException e1) {
+    							// TODO Auto-generated catch block
+    							e1.printStackTrace();
+    						}
+                            
+                            
+                            String issue = table.getModel().getValueAt(i, 3).toString();
+                            Date issue_date;
+							try {
+								issue_date = new SimpleDateFormat("yyyy-MM-dd").parse(issue);
+								String elp = table.getModel().getValueAt(i, 5).toString();
+								int elpsed=Integer.parseInt(elp);  
+								long date1 =issue_date.getTime() ;
+								long date2=Now.getTime();
+								
+								long diff=date2 - date1;
+								int c=(int)diff;
+								c=c/(1000 * 60 * 60* 24);
+								int Fine = (c-elpsed)*100;
+								String fine=String.valueOf(Fine);
+								if(c>elpsed) {
+									
+									
+									 try {
+				       	        	    	
+			    							PreparedStatement st = connection.prepareStatement("UPDATE issue_book SET  fine = ?   WHERE id = "+value+"");
+			    							st.setString(1, fine);
+			    							st.executeUpdate(); 
+			    						} catch (SQLException e1) {
+			    							// TODO Auto-generated catch block
+			    							e1.printStackTrace();
+			    						}
+									 model.setValueAt(fine, i, 6);
+									
+									 System.out.print(fine)		;																				
+									
+									
+									JOptionPane.showMessageDialog(null, "You Have To Pay A FINE :"+ Fine+"DT !!");
+									JOptionPane.showMessageDialog(null, "Book Returned Successfully!!");
+								}
+								else {
+									 JOptionPane.showMessageDialog(null, "Book Returned Successfully!!");
+								}
+								
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+                            
+                           
+                         
+                            
+                            
+                            
+                           
+    	    			}
+    	    			else {
+    	    				JOptionPane.showMessageDialog(null, "Already Returned!! Select A Book to Return");
+    	    			}
+                        
     		        }
     	    		else {
-    	                try {
-    	                	PreparedStatement stmt = connection.prepareStatement("INSERT INTO issue_book(username,userid,bookname,bookisbn,issuedate,returndate) VALUES ('" + user_name.getText() + "','"+ user_id.getText() +"','"+ book_name.getText() +"','"+ book_isbn.getText() + "','" + return_date.getText()+"','" + dayselp.getText()+"')");
-    	                	stmt.executeUpdate(); 
-				            ResultSet rs = stmt.executeQuery("SELECT * FROM issue_book WHERE id=(SELECT max(id) FROM issue_book);"); 
-
-				            while (rs.next()) {
-				                int id = rs.getInt("id");
-				                String username = rs.getString("username");
-				                String userid = rs.getString("userid");
-				                String bookname = rs.getString("bookname");
-				                String bookisbn = rs.getString("bookisbn");
-				                String issuedate = rs.getString("issuedate");
-				                String returndate = rs.getString("returndate");
-
-        	    			columns[0] = id + "";
-        	    			columns[1] = username;
-        	    			columns[2] = userid;
-        	    			columns[3] = bookname;
-        	    			columns[4] = bookisbn;
-        	    			columns[5] = issuedate;
-        	    			columns[6] = returndate+ "";
-     
-        	    			model.addRow(columns);
-        	    			
-        	    			user_name.setText("");
-        	    			user_id.setText("");
-        	    			book_name.setText("");
-        	    			book_isbn.setText("");
-        	    			return_date.setText("");
-        	    			dayselp.setText("");
-				            }
-  
-    	                
-    	                  
-    	                }
-    	                catch (SQLException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-
-    	    			
-
+    	    			JOptionPane.showMessageDialog(null, "Please Select a Book To Return !!");
     	    		}
     	    	}
     	    });
-    	    returnbook.setBounds(10, 214, 75, 21);
+    	    returnbook.setBounds(20, 189, 102, 31);
     	    getContentPane().add(returnbook);
     	    
     	    
@@ -154,81 +250,24 @@ public class Return_Book extends JFrame {
     	          @Override
     	          public void valueChanged(ListSelectionEvent e) {
     	                int i = table.getSelectedRow();
-    	                user_name.setText((String)model.getValueAt(i, 1));
-    	                user_id.setText((String)model.getValueAt(i, 2));
-    	                book_name.setText((String)model.getValueAt(i, 3));
-    	                book_isbn.setText((String)model.getValueAt(i, 4));
-    	                return_date.setText((String)model.getValueAt(i, 5));
-    	                dayselp.setText((String)model.getValueAt(i, 6));
+    	               
+    	              
+    	               
 
     	            }
     	        });
     	    
-    	    JLabel lblNewLabel = new JLabel("User Name:");
-    	    lblNewLabel.setBounds(10, 84, 85, 13);
-    	    getContentPane().add(lblNewLabel);
-    	    
-    	    user_id = new JTextField();
-    	    user_id.addInputMethodListener(new InputMethodListener() {
-    	    	public void caretPositionChanged(InputMethodEvent event) {
-    	    	}
-    	    	public void inputMethodTextChanged(InputMethodEvent event) {
-    	    	
-    	    	}
-    	    });
-    	    user_id.setBounds(93, 54, 118, 19);
-    	    getContentPane().add(user_id);
-    	    user_id.setColumns(10);
-    	    
-    	    return_date = new JTextField();
-    	    return_date.setBounds(93, 108, 118, 19);
-    	    getContentPane().add(return_date);
-    	    return_date.setColumns(10);
-    	    
-    	    JLabel lblNewLabel_3 = new JLabel("Return Date:");
-    	    lblNewLabel_3.setBounds(10, 112, 75, 13);
-    	    getContentPane().add(lblNewLabel_3);
-    	    
-    	    JLabel lblNewLabel_4 = new JLabel("User ID:");
-    	    lblNewLabel_4.setBounds(10, 58, 75, 13);
+    	    JLabel lblNewLabel_4 = new JLabel("User Name:");
+    	    lblNewLabel_4.setBounds(37, 56, 75, 13);
     	    getContentPane().add(lblNewLabel_4);
     	    
-    	    dayselp = new JTextField();
-    	    dayselp.setBounds(93, 138, 118, 20);
-    	    getContentPane().add(dayselp);
-    	    dayselp.setColumns(10);
-    	    
-    	    JLabel lblNewLabel_5 = new JLabel("Days Elapsed :");
-    	    lblNewLabel_5.setBounds(10, 138, 75, 14);
-    	    getContentPane().add(lblNewLabel_5);
-    	    
-    	    JButton Clear = new JButton("Clear");
-    	    Clear.addActionListener(new ActionListener() {
-    	    	public void actionPerformed(ActionEvent e) {
-    	    		
-    	    		user_name.setText("");
-    				user_id.setText("");
-    				book_name.setText("");
-    				book_isbn.setText("");
-    				return_date.setText("");
-    				dayselp.setText("");
-    	    	}
-    	    });
-    	    Clear.setBounds(94, 214, 75, 21);
-    	    getContentPane().add(Clear);
-    	    
     	    JButton Back = new JButton("Back");
-    	    Back.setBounds(179, 214, 75, 21);
+    	    Back.setBounds(20, 231, 102, 31);
     	    getContentPane().add(Back);
     	    
-    	    JLabel lblNewLabel_1 = new JLabel("Fine :");
-    	    lblNewLabel_1.setBounds(10, 172, 46, 14);
-    	    getContentPane().add(lblNewLabel_1);
-    	    
-    	    fine = new JTextField();
-    	    fine.setBounds(93, 169, 118, 20);
-    	    getContentPane().add(fine);
-    	    fine.setColumns(10);
+    	    JLabel user_name = new JLabel("............");
+    	    user_name.setBounds(47, 80, 46, 14);
+    	    getContentPane().add(user_name);
     	    
 
             
