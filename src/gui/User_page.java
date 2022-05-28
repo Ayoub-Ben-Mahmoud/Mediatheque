@@ -73,7 +73,32 @@ public class User_page extends JFrame {
 		});
 		Logout.setBounds(415, 20, 85, 21);
 		contentPane.add(Logout);
+		
+		JButton btnIssueBook = new JButton("Issue Book");
+		btnIssueBook.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				Issue_Book IssueBook = new Issue_Book(id);
+			}
+		});
+		btnIssueBook.setBounds(58, 86, 180, 44);
+		contentPane.add(btnIssueBook);
+		
+		JButton btnReturnBook = new JButton("Return Book");
+		btnReturnBook.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				Return_Book ReturnBook = new Return_Book(id);
+			}
+		});
+		btnReturnBook.setBounds(284, 86, 180, 44);
+		contentPane.add(btnReturnBook);
+		
+		JButton btnIssueBook_1 = new JButton("Issue Book");
+		btnIssueBook_1.setBounds(173, 180, 180, 44);
+		contentPane.add(btnIssueBook_1);
 	    
+		
 	    try {
             Statement st = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = st.executeQuery("SELECT * FROM users WHERE id="+id+"");

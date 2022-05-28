@@ -26,22 +26,23 @@ public class Issue_Book extends JFrame {
 	private JTable IsuueTable;
 	private JTextField book_id;
 	private JTextField period_d;
+	private JTextField bookn;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Issue_Book frame = new Issue_Book();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					Issue_Book frame = new Issue_Book();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -77,7 +78,7 @@ public class Issue_Book extends JFrame {
 		}
 		return stock;
 	}
-	public Issue_Book() {
+	public Issue_Book(String uid) {
 		
 		
 	    super("Issue Book");
@@ -161,7 +162,7 @@ public class Issue_Book extends JFrame {
     	    			
     	    			
     	                try {
-    	                	PreparedStatement stmt = connection.prepareStatement("INSERT INTO issue_book(bookid,period) VALUES ('"+ book_id.getText() +"','" + period_d.getText()+"')");
+    	                	PreparedStatement stmt = connection.prepareStatement("INSERT INTO issue_book(userid,bookid,period) VALUES ('"+ uid +"','"+ book_id.getText() +"','" + period_d.getText()+"')");
     	                	stmt.executeUpdate(); 
 				            ResultSet rs = stmt.executeQuery("SELECT * FROM issue_book WHERE id=(SELECT max(id) FROM issue_book);"); 
 
@@ -173,6 +174,7 @@ public class Issue_Book extends JFrame {
 				                String fine = rs.getString("fine");
 
         	    			columns[0] = id + "";
+        	    			columns[1] = bookn.getText();
         	    			columns[2] = bookid;
         	    			columns[3] = issuedate;
         	    			columns[4] = "";
@@ -251,6 +253,8 @@ public class Issue_Book extends JFrame {
     	    JButton Back = new JButton("Back");
     	    Back.addActionListener(new ActionListener() {
     	    	public void actionPerformed(ActionEvent e) {
+    				dispose();
+    				User_page IssueBook = new User_page(uid);
     	    	}
     	    });
     	    Back.setBounds(180, 214, 75, 21);
@@ -265,15 +269,11 @@ public class Issue_Book extends JFrame {
     	    lblNewLabel.setBounds(10, 128, 75, 14);
     	    getContentPane().add(lblNewLabel);
     	    
-    	    JLabel book_name = new JLabel(".............................................");
-    	    book_name.setBounds(95, 126, 128, 19);
-    	    getContentPane().add(book_name);
-    	    
     	    JLabel lblNewLabel_2 = new JLabel("User Name :");
     	    lblNewLabel_2.setBounds(10, 88, 75, 14);
     	    getContentPane().add(lblNewLabel_2);
     	    
-    	    JLabel lblNewLabel_3 = new JLabel("..................................................");
+    	    JLabel lblNewLabel_3 = new JLabel("");
     	    lblNewLabel_3.setBounds(95, 88, 128, 14);
     	    getContentPane().add(lblNewLabel_3);
     	    
@@ -284,11 +284,11 @@ public class Issue_Book extends JFrame {
     	    		String bookid =book_id.getText();
     	    	    try {
     	    	    	Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-    	    	    	ResultSet rs = stmt.executeQuery( "SELECT * FROM issue_book  JOIN documents ON issue_book.bookid=documents.id where documents.id="+bookid+" ");
+    	    	    	ResultSet rs = stmt.executeQuery( "SELECT * FROM documents where id="+bookid+" ");
     	    	    	while (rs.next()) {
 
-    	    	    		String bookname = rs.getString("documents.bookname");
-    	    	    		book_name.setText(bookname);
+    	    	    		String bookns = rs.getString("documents.bookname");
+    	    	    		bookn.setText(bookns);
     	    	    		}
     	    	    	     
     				} 
@@ -302,6 +302,24 @@ public class Issue_Book extends JFrame {
     	    search.setBounds(110, 55, 89, 23);
     	    getContentPane().add(search);
     	    
+    	    bookn = new JTextField();
+    	    bookn.setEditable(false);
+    	    bookn.setBounds(100, 126, 118, 19);
+    	    getContentPane().add(bookn);
+    	    bookn.setColumns(10);
+    	    
+    	    try {
+                Statement st = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    			ResultSet rs = st.executeQuery("SELECT * FROM users WHERE id="+uid+"");
+                while (rs.next()) {
+                    String uname = rs.getString("name");
+                    lblNewLabel_3.setText(uname);	
+
+                }
+    		} catch (SQLException e1) {
+    			// TODO Auto-generated catch block
+    			e1.printStackTrace();
+    		}
 
 	}
 }

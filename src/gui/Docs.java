@@ -1,21 +1,44 @@
 package gui;
+
+
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
 import java.sql.*;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
 import DataBase.Queries;
 import javax.swing.JTable;
-import javax.swing.JScrollPane;
+import java.awt.ScrollPane;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 public class Docs extends JFrame {
+	
+ 	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+			try {
+				String uid = null;
+				Docs docs = new Docs(uid);
+				docs.setVisible(true);
+				docs.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}	
+	
 	//private JTable table;
 	//private DefaultTableModel model;
 	public int count() {
@@ -33,7 +56,7 @@ public class Docs extends JFrame {
 		return count;
 	}
 	
-	public Docs() {
+	public Docs(String uid) {
 		//Connection to DataBase 
 		Connection conn= Queries.conn();
 		getContentPane().setLayout(null);
@@ -89,7 +112,7 @@ public class Docs extends JFrame {
 		
 		int count = count();
 		
-		String columns[] = {"ISBN","Title","Author","Genre","Pages","Stock"};
+		String columns[] = {"id","Title","Author","Genre","Pages","Stock"};
 		String data[][] = new String [count][6];
 		//DefaultTableModel model = new DefaultTableModel(data, columns);
 		JTable table = new JTable(data,columns);
@@ -134,14 +157,14 @@ public class Docs extends JFrame {
 
             while (rs.next()) {
  
-                int isbn = rs.getInt("ISBN");
+                int id = rs.getInt("id");
                 String title = rs.getString("bookname");
                 String author = rs.getString("author");
                 String genre = rs.getString("genre");
                 String pages = rs.getString("pages");
                 String stock = rs.getString("stock");
 
-                data[i][0] = isbn + "";
+                data[i][0] = id + "";
                 data[i][1] = title;
                 data[i][2] = author;
                 data[i][3] = genre;
@@ -170,17 +193,17 @@ public class Docs extends JFrame {
 						 PreparedStatement stmt = conn.prepareStatement("INSERT INTO documents(bookname,genre,author,pages,stock) "
 						 + "VALUES ('" + textTitle.getText() + "','" + textG.getText() + "','" + textAuth.getText() + "','" + txtP.getText() + "','" + txtS.getText() +"')");
 						 stmt.executeUpdate();
-						 ResultSet rs = stmt.executeQuery("SELECT * FROM documents WHERE ISBN=(SELECT max(ISBN) FROM documents);");
+						 ResultSet rs = stmt.executeQuery("SELECT * FROM documents WHERE id=(SELECT max(id) FROM documents);");
 						 int i=0;
 						 while (rs.next()) {
-				                String isbn = rs.getString("ISBN");
+				                String id = rs.getString("id");
 				                String title = rs.getString("bookname");
 				                String author = rs.getString("author");
 				                String genre = rs.getString("genre");
 				                String pages = rs.getString("pages");
 				                String stock = rs.getString("stock");
 				                
-				                columns[0] = isbn + "";
+				                columns[0] = id + "";
 	        	    			columns[1] = title;
 	        	    			columns[2] = author;
 	        	    			columns[3] = genre;
@@ -209,7 +232,7 @@ public class Docs extends JFrame {
 	    			
 	    			 try {
  	        	    	
-							PreparedStatement st = conn.prepareStatement("UPDATE documents SET bookname = ? , genre = ? , author = ?  ,  pages = ? , stock = ?   WHERE ISBN = "+value+"");
+							PreparedStatement st = conn.prepareStatement("UPDATE documents SET bookname = ? , genre = ? , author = ?  ,  pages = ? , stock = ?   WHERE id = "+value+"");
 							
 							st.setString(1, textTitle.getText());
 							st.setString(2, textAuth.getText());
@@ -247,7 +270,7 @@ public class Docs extends JFrame {
 					table.removeRowSelectionInterval(i, i);
                 try {
        	    	
-					PreparedStatement st = conn.prepareStatement("DELETE FROM documents WHERE ISBN = "+value+"");
+					PreparedStatement st = conn.prepareStatement("DELETE FROM documents WHERE id = "+value+"");
 					
 			        st.executeUpdate(); 
 			        
@@ -266,20 +289,20 @@ public class Docs extends JFrame {
 		btnDelete.setBounds(193, 360, 117, 23);
 		getContentPane().add(btnDelete);
 		
+		JButton back = new JButton("Back");
+		back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+          	  Admin_page User_page = new Admin_page(uid);
+
+				dispose();
+
+			}
+		});
+		back.setBounds(203, 393, 85, 21);
+		getContentPane().add(back);
+		
 	}
 		
- 	public static void main(String[] args) {
- 		EventQueue.invokeLater(new Runnable() {
- 			public void run() {
- 				try {
- 					Docs docs = new Docs();
- 					docs.setVisible(true);
- 					docs.setExtendedState(JFrame.MAXIMIZED_BOTH);
- 				} catch (Exception e) {
- 					e.printStackTrace();
- 				}
- 			}
- 		});
- 	}	
+
 }
 

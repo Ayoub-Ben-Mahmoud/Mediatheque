@@ -30,21 +30,21 @@ import java.awt.event.InputMethodEvent;
 public class Return_Book extends JFrame {
 	private JTable ReturnTable;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Return_Book frame = new Return_Book();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					Return_Book frame = new Return_Book();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -82,7 +82,7 @@ public class Return_Book extends JFrame {
 		return stock;
 	}
 	
-	public Return_Book() {
+	public Return_Book(String uid) {
 		
 		
 	    super("Return Book");
@@ -258,17 +258,36 @@ public class Return_Book extends JFrame {
     	        });
     	    
     	    JLabel lblNewLabel_4 = new JLabel("User Name:");
-    	    lblNewLabel_4.setBounds(37, 56, 75, 13);
+    	    lblNewLabel_4.setBounds(20, 61, 75, 13);
     	    getContentPane().add(lblNewLabel_4);
     	    
     	    JButton Back = new JButton("Back");
+    	    Back.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    				dispose();
+    				User_page IssueBook = new User_page(uid);
+    	    	}
+    	    });
+    	    
     	    Back.setBounds(20, 231, 102, 31);
     	    getContentPane().add(Back);
     	    
-    	    JLabel user_name = new JLabel("............");
-    	    user_name.setBounds(47, 80, 46, 14);
+    	    JLabel user_name = new JLabel("");
+    	    user_name.setBounds(37, 84, 75, 14);
     	    getContentPane().add(user_name);
     	    
+    	    try {
+                Statement st = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    			ResultSet rs = st.executeQuery("SELECT * FROM users WHERE id="+uid+"");
+                while (rs.next()) {
+                    String uname = rs.getString("name");
+                    user_name.setText(uname);	
+
+                }
+    		} catch (SQLException e1) {
+    			// TODO Auto-generated catch block
+    			e1.printStackTrace();
+    		}
 
             
    

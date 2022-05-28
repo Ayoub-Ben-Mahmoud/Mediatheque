@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import DataBase.Queries;
 
+import javax.print.Doc;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -63,7 +64,7 @@ public class Admin_page extends JFrame {
 				  dispose();
 			}
 		});
-		btnNewButton.setBounds(245, 72, 180, 44);
+		btnNewButton.setBounds(275, 72, 180, 44);
 		contentPane.add(btnNewButton);
 		
 		
@@ -71,9 +72,8 @@ public class Admin_page extends JFrame {
 		JButton btnGutilisateurs = new JButton("User Mangement");
 		btnGutilisateurs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+		      dispose();
            	  User_Mangement userm = new User_Mangement(id);
-			  dispose();
-
 			}
 		});
 		
@@ -81,7 +81,7 @@ public class Admin_page extends JFrame {
 
 
 		
-		btnGutilisateurs.setBounds(44, 72, 180, 44);
+		btnGutilisateurs.setBounds(59, 72, 180, 44);
 		contentPane.add(btnGutilisateurs);
 		
 		JLabel name = new JLabel("Hello");
@@ -91,12 +91,23 @@ public class Admin_page extends JFrame {
 		JButton Logout = new JButton("Logout");
 		Logout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				dispose();
 				Login login = new Login();
+			}
+		});
+		
+		Logout.setBounds(415, 20, 85, 21);
+		contentPane.add(Logout);
+		
+		JButton btnBooksMangement = new JButton("Books Mangement");
+		btnBooksMangement.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Docs doc = new Docs(id);
 				dispose();
 			}
 		});
-		Logout.setBounds(415, 20, 85, 21);
-		contentPane.add(Logout);
+		btnBooksMangement.setBounds(173, 166, 180, 44);
+		contentPane.add(btnBooksMangement);
 		
 	    setVisible(true);
 	    setResizable(false);
